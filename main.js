@@ -66,6 +66,39 @@ function addColumnToSheet(sheet, subject) {
   sheet.getRange('b3').setValue(subject['deadline'])
 }
 
+//　
+function getSubjectFromFormSheet()
+{
+  const sheet = SpreadsheetApp.getActiveSheet()
+  const range = sheet.getActiveRange()
+  return getSubjects(sheet, range)
+}
+
+function getSubjects(sheet, range)
+{
+  const row = range.getRow()
+  const col_title = 3
+  const col_date = 4
+  ret = {}
+  ret['title'] = sheet.getRange(row, col_title).getValue()
+  ret['date'] = sheet.getRange(row, col_date).getValue()
+  return ret
+}
+
+function findSubjectColumnIndex(sheet, subject)
+{
+  const range = sheet.getDataRange()
+  for (let col=1; col < range.getLastColumn(); col++)
+  {
+    const title = range.getCell(1,col).getValue()
+    if (title.includes(subject['title']))
+    {
+      return col
+    }
+  }
+  return -1
+}
+
 function showAttendances() {
   const sheet = SpreadsheetApp.getActiveSheet()
   const col = sheet.getActiveRange().getColumn()
@@ -73,8 +106,12 @@ function showAttendances() {
   Browser.msgBox(msg)
 }
 
-function makeMgsAttendancesOnePart(sheet, col) {
-  let msg = sheet.getRange(1, col).getValue() + "\\n"
+function makeMgsAttendancesOnePart(sheet, col) 
+{
+  let msg = ''
+//  const created = new Date()
+//  const created_str = Utilities.formatDate(created, 'JST', 'yyyy-MM-dd HH:mm:ss');
+//  msg += `出力日時: ${created_str}`
 
   const num_rows = sheet.getMaxRows()
 
@@ -92,6 +129,7 @@ function makeMgsAttendancesOnePart(sheet, col) {
         attendances[type].push(`${member_name} ${answer.replace(type, '')}`)
       }
     }
+    if (attendances[type].length <= 0){ return }
     msg += `${type}: ${attendances[type].length}\\n`
     attendances[type].forEach(row => {
       msg += row + "\\n"
@@ -100,10 +138,44 @@ function makeMgsAttendancesOnePart(sheet, col) {
   return msg
 }
 
+function makeMgsAttendancesAllParts(subject) 
+{
+  const created = new Date()
+  const created_str = Utilities.formatDate(created, 'JST', 'yyyy-MM-dd HH:mm:ss');
+  let msg = `出力日時: ${created_str}\\n\\n`
+
+  const subject_date = new Date(subject['date'])
+  const subject_date_str = Utilities.formatDate(subject_date, 'JST', 'yyyy-MM-dd'); // todo 曜日
+
+  msg += `${subject_date_str} ${subject['title']}`;
+
+  const ss = SpreadsheetApp.openByUrl('https://docs.google.com/spreadsheets/d/1PSS_v3A5h0srfkSJXeteHQbpXFkpZYDIMlkuuJk3sCM/edit')
+
+  const parts = ['鳴り物','女踊り', '男踊り(青)', '女男踊り(助)', '浴衣','子供(黄)']
+  parts.map( part => {
+    const sheet = ss.getSheetByName(part)
+    const col_index = findSubjectColumnIndex(sheet, subject)
+    if (col_index != -1)
+    {
+      msg += `\\n# ${part}`
+      msg += makeMgsAttendancesOnePart(sheet, col_index)
+    }
+  })
+
+  return msg
+}
+
+function showAttendancesAllParts() {
+  const subject = getSubjectFromFormSheet()
+  const msg = makeMgsAttendancesAllParts(subject) 
+  Browser.msgBox(msg)
+}
+
 function onOpen() {
   const customMenu = SpreadsheetApp.getUi()
   customMenu.createMenu('しるばあ機能')
     .addItem('列追加', 'addColumn')
-    .addItem('集計', 'showAttendances')
+    .addItem('集計(パート毎)', 'showAttendances')
+    .addItem('集計(全パート)', 'showAttendancesAllParts')
     .addToUi()
 }
