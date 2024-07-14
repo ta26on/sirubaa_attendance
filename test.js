@@ -1,5 +1,5 @@
 function test_readAttendanceSubject() {
-  const ss = SpreadsheetApp.openByUrl('https://docs.google.com/spreadsheets/d/1PSS_v3A5h0srfkSJXeteHQbpXFkpZYDIMlkuuJk3sCM/edit')
+  const ss = SpreadsheetApp.openByUrl(SS_URL)
   const result = readAttendanceSubject(ss)
 
   Logger.log(result)
@@ -8,7 +8,7 @@ function test_readAttendanceSubject() {
 
 function test_isExistTitle()
 {
-  const ss = SpreadsheetApp.openByUrl('https://docs.google.com/spreadsheets/d/1PSS_v3A5h0srfkSJXeteHQbpXFkpZYDIMlkuuJk3sCM/edit')
+  const ss = SpreadsheetApp.openByUrl(SS_URL)
   const subjects = readAttendanceSubject(ss)
 
   const subject = subjects[0]
@@ -22,8 +22,8 @@ function test_isExistTitle()
 
 function test_getSubjects()
 {
-  const ss = SpreadsheetApp.openByUrl('https://docs.google.com/spreadsheets/d/1PSS_v3A5h0srfkSJXeteHQbpXFkpZYDIMlkuuJk3sCM/edit')
-  const sheet = ss.getSheetByName('フォームの回答 2')
+  const ss = SpreadsheetApp.openByUrl(SS_URL)
+  const sheet = ss.getSheetByName(FORM_NAME)
   const range = sheet.getRange('A2')
 
   const result = getSubjects(sheet, range)
@@ -33,7 +33,7 @@ function test_getSubjects()
 
 function test_findSubjectColumnIndex()
 {
-  const ss = SpreadsheetApp.openByUrl('https://docs.google.com/spreadsheets/d/1PSS_v3A5h0srfkSJXeteHQbpXFkpZYDIMlkuuJk3sCM/edit')
+  const ss = SpreadsheetApp.openByUrl(SS_URL)
   const sheet = ss.getSheetByName('鳴り物')
 
   const subject = {'title':'氏家', 'date': '2024/07/21'}
@@ -44,7 +44,7 @@ function test_findSubjectColumnIndex()
 
 function test_makeMgsAttendancesOnePart()
 {
-  const ss = SpreadsheetApp.openByUrl('https://docs.google.com/spreadsheets/d/1PSS_v3A5h0srfkSJXeteHQbpXFkpZYDIMlkuuJk3sCM/edit')
+  const ss = SpreadsheetApp.openByUrl(SS_URL)
   const sheet = ss.getSheetByName('鳴り物')
 
   const subject = {'title':'氏家', 'date': '2024/07/21'}
