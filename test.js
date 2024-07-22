@@ -58,7 +58,7 @@ function test_makeMgsAttendancesOnePart()
 
 function test_makeMgsAttendancesAllParts()
 {
-  const subject = {'title':'氏家', 'date': '2024/07/21'}
+  const subject = {'title':'富士見丘', 'date': '2024/08/03'}
   const msg =  makeMgsAttendancesAllParts(subject) 
   Logger.log(msg)  
 }
